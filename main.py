@@ -7,7 +7,7 @@ import json
 
 import psycopg2
 
-
+#need to remove this
 conn=psycopg2.connect("postgresql://postgres:b633A6ag-ACAb64652fd6EBgB42-C-5F@viaduct.proxy.rlwy.net:13096/railway")
 cursor = conn.cursor()
 
