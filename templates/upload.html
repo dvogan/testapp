@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+       
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure content stretches to the bottom */
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 100%; /* Responsive width */
+            max-width: 400px; /* Limit maximum width for larger screens */
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #file-upload {
+            display: none;
+        }
+
+        label[for="file-upload"] {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%; /* Responsive width */
+            max-width: 200px; /* Limit maximum width for larger screens */
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        label[for="file-upload"]:hover {
+            background-color: #2980b9;
+        }
+
+        #upload-button {
+            background-color: #27ae60;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%; /* Responsive width */
+            max-width: 200px; /* Limit maximum width for larger screens */
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        #upload-button:hover {
+            background-color: #219453;
+        }
+
+        #result-textarea {
+            width: 100%;
+            height: 150px;
+            margin-top: 20px;
+            padding: 10px;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        /* Add styles for the spinner */
+        .spinner-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent overlay */
+            z-index: 1; /* Ensure spinner is on top of other content */
+            display: none; /* Initially hidden */
+        }
+
+        .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.3);
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%; /* Allow full-width on smaller screens */
+            }
+
+            label[for="file-upload"],
+            #upload-button {
+                width: 80%; /* Set both elements to take up 80% of the available width */
+                margin: 10px auto; /* Center the buttons horizontally */
+            }
+
+            h1 {
+                font-size: 24px; /* Reduce font size on smaller screens */
+            }
+
+            #result-textarea {
+                height: 100px; /* Reduce textarea height on smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 100%; /* Allow full-width on smaller screens */
+                max-width: none; /* Remove the maximum width constraint */
+                margin: 10px; /* Add some margin to space it properly */
+            }
+
+            label[for="file-upload"],
+            #upload-button {
+                width: 80%; /* Set both elements to take up 80% of the available width */
+                margin: 10px auto; /* Center the buttons horizontally */
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload a File</h1>
+        <input type="file" id="file-upload">
+        <label for="file-upload">Choose a File</label>
+        <button id="upload-button">Upload</button>
+        <div class="spinner-container" id="spinner-container">
+            <div class="spinner" id="spinner"></div>
+        </div>
+        <textarea id="result-textarea" placeholder="Code-generated content will appear here"></textarea>
+    </div>
+
+    <script>
+        const fileUpload = document.getElementById('file-upload');
+        const resultTextarea = document.getElementById('result-textarea');
+        const spinnerContainer = document.getElementById('spinner-container');
+
+        fileUpload.addEventListener('change', async (event) => {
+            const selectedFile = event.target.files[0];
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                // Show the spinner while processing
+                spinnerContainer.style.display = 'flex';
+
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        resultTextarea.value = data.result;
+                    } else {
+                        resultTextarea.value = 'Error occurred during upload and processing.';
+                    }
+                } catch (error) {
+                    resultTextarea.value = 'An error occurred while communicating with the server.';
+                    console.error(error);
+                } finally {
+                    // Hide the spinner when processing is complete
+                    spinnerContainer.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
