@@ -91,39 +91,62 @@ def process_photo(filename):
     data=response.json()['choices'][0]['message']['content']
 
     print(data)
+    #return data
 
-    return data
 
-'''
     parsed_json = json.loads(data)
-    person_list = []
 
-    for item in parsed_json:
-        person_details = {"lastname":None, "firstname":None, "middlename":None, "birthdate":None, "deathdate":None}
-        person_details['lastname'] = item['lastname']
-        person_details['firstname'] = item['firstname']
-        person_details['middlename'] = item['middlename']
-        person_details['birthdate'] = item['birthdate']
-        person_details['deathdate'] = item['deathdate']
-        person_list.append(person_details)
+    results=""
 
-    print(len(person_list))
+    isTombstone=parsed_json['isTombstone']
+    description=parsed_json['description']
+    
+    if not isTombstone:
+        results="This does not appear to be a tombstone.\n\n" + description
 
-    results=[]
+    else:
+        results="This appears to be a tombstone.\n\n" + description
 
-    for person in person_list:
-        sql="SELECT * FROM interments WHERE lastname = '{0}' AND firstname = '{1}'".format(person['lastname'], person['firstname'])
-        print(sql)
+        rawList = []
 
-        mycursor.execute(sql)
-        result = mycursor.fetchall()
+        for item in parsed_json['people']:
+            person_details = {"lastname":None, "firstname":None, "middlename":None, "birthdate":None, "deathdate":None}
+            person_details['lastname'] = item['lastname']
+            person_details['firstname'] = item['firstname']
+            person_details['middlename'] = item['middlename']
+            person_details['birthdate'] = item['birthdate']
+            person_details['deathdate'] = item['deathdate']
+            rawList.append(person_details)
 
-        results.append(result)
+        #print(len(rawList))
 
-        print(result)
+        peoplelist=[]
 
-        return jsonify({'result': result})
-'''
+        details="\n\n"
+
+        for entry in rawList:
+            sql="SELECT * FROM interments WHERE lastname = '{0}' AND firstname = '{1}'".format(entry['lastname'], entry['firstname'])
+            print(sql)
+
+            cursor.execute(sql)
+            row = cursor.fetchone()
+
+            peoplelist.append(row)
+
+            #print(peoplelist)
+            details+=row[2] + " " + row[1] + "\n" + row[7] + "\n"
+
+            if row[8] is None:
+                details+="No obituary found"
+            else:
+                details+=row[8]
+            
+            details+="\n\n"
+
+        results += details
+
+    return results
+
 # Function to encode the image
 def encode_image(image_path):
   with open(image_path, "rb") as image_file:

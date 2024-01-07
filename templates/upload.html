@@ -51,24 +51,6 @@
             background-color: #2980b9;
         }
 
-        #upload-button {
-            background-color: #27ae60;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%; /* Responsive width */
-            max-width: 200px; /* Limit maximum width for larger screens */
-            display: inline-block;
-            margin: 10px 0;
-        }
-
-        #upload-button:hover {
-            background-color: #219453;
-        }
-
         #result-textarea {
             width: 100%;
             height: 150px;
@@ -113,8 +95,7 @@
                 max-width: 100%; /* Allow full-width on smaller screens */
             }
 
-            label[for="file-upload"],
-            #upload-button {
+            label[for="file-upload"] {
                 width: 80%; /* Set both elements to take up 80% of the available width */
                 margin: 10px auto; /* Center the buttons horizontally */
             }
@@ -135,8 +116,7 @@
                 margin: 10px; /* Add some margin to space it properly */
             }
 
-            label[for="file-upload"],
-            #upload-button {
+            label[for="file-upload"] {
                 width: 80%; /* Set both elements to take up 80% of the available width */
                 margin: 10px auto; /* Center the buttons horizontally */
             }
@@ -149,9 +129,11 @@
         <h1>Upload a File</h1>
         <input type="file" id="file-upload">
         <label for="file-upload">Choose a File</label>
-        <button id="upload-button">Upload</button>
         <div class="spinner-container" id="spinner-container">
             <div class="spinner" id="spinner"></div>
+        </div>
+        <div>
+            <label id="isTombstoneDisplay"></label>
         </div>
         <textarea id="result-textarea" placeholder="Code-generated content will appear here"></textarea>
     </div>
@@ -178,6 +160,7 @@
 
                     if (response.ok) {
                         const data = await response.json();
+                        console.log(data.result)
                         resultTextarea.value = data.result;
                     } else {
                         resultTextarea.value = 'Error occurred during upload and processing.';
