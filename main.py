@@ -43,6 +43,46 @@ def upload():
     return jsonify({'result': result})
 
 
+@app.route('/addObituary')
+def addObituary():
+    return render_template('addObituary.html')
+
+@app.route('/search', methods=['POST'])
+def search():
+    print("here!")
+    #try:
+    data = request.get_json()
+    first_name = data.get('firstName', '').lower()
+    last_name = data.get('lastName', '').lower()
+
+    sql="SELECT id,lastname,firstname,middlename, TO_CHAR(intermentdate,'MM/DD/YYYY') FROM interments WHERE Lower(lastname) = '{0}' ".format(last_name)
+
+    if first_name:
+        sql+="AND Lower(firstname) = '{1}' ".format(first_name)
+
+    sql+= " ORDER BY lastname, firstname, intermentdate"
+
+    print(sql)
+
+    cursor.execute(sql)
+
+    results = []
+
+    # Loop through the cursor results and build the list of dictionaries
+    for row in cursor:
+        result_dict = {
+            'first_name': row[2],  
+            'last_name': row[1],  
+            'interment_date': row[4], 
+            'id': row[0], 
+            # Add more key-value pairs for other columns if needed
+        }
+        results.append(result_dict)
+
+    return jsonify(results), 200
+    #except Exception as e:
+    #    return jsonify({"error": "An error occurred during the search."}), 500
+
 
 def process_photo(filename):
     # Path to your image
