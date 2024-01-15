@@ -99,8 +99,8 @@ def process_photo(filename):
     prompt="Please determine what object is in the picture. " \
         "Respond in a JSON format. Do not inlude '```json' in your response. " \
         "Respond with a JSON object with a top-level property called 'isTombstone' with a boolean value indicating if it is. " \
-        "If it is a tombstone also include a top-level property called 'description' with a detailed description of the tombstone. " \
-        "Please note it's color, shape, appearance and other chacteristics, but make no mention of the text on it. Also respond with an array containing an object for each person's lastname, firstname, middlename (if it exists), birthdate, and deathdate. " \
+        "If it is a tombstone also include a top-level property called 'description' with a detailed description of the tombstone, " \
+        "but make no mention of the text on it. Also respond with an array containing an object for each person's lastname, firstname, middlename (if it exists), birthdate, and deathdate. " \
         "If it is not a tombstone, include a property with a detailed description of what it is. "
 
     payload = {
@@ -136,6 +136,8 @@ def process_photo(filename):
 
     parsed_json = json.loads(data)
 
+    #print(parsed_json)
+
     results=""
 
     isTombstone=parsed_json['isTombstone']
@@ -170,18 +172,20 @@ def process_photo(filename):
 
             cursor.execute(sql)
             row = cursor.fetchone()
+            if row:
+                print(row)
 
-            peoplelist.append(row)
+                peoplelist.append(row)
 
-            #print(peoplelist)
-            details+=row[2] + " " + row[1] + "\n" + row[7] + "\n"
+                #print(peoplelist)
+                details+=row[2] + " " + row[1] + "\n" + row[7] + "\n"
 
-            if row[8] is None:
-                details+="No obituary found"
-            else:
-                details+=row[8]
-            
-            details+="\n\n"
+                if row[8] is None:
+                    details+="No obituary found"
+                else:
+                    details+=row[8]
+                
+                details+="\n\n"
 
         results += details
 
